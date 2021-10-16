@@ -25,7 +25,7 @@ async function onMapClick(e) {
     const responseA = await fetch(API_AIR);
     const dataA = await responseA.json();
     console.log(dataA)
-    
+
     const message = "<b>" + dataM.name + "</b><br>Temperatura : " + ((dataM.main.temp - 273).toFixed(1)) + "°C<br>Clima : " + dataM.weather[0].description + "<br>Índice de calidad del aire  : " + dataA.data.aqi
     popup
         .setLatLng(e.latlng)
@@ -90,13 +90,16 @@ async function getPythonApi(nomCouche, cleAPI) {
 
         let iconObj = getColorIcon(nomCouche)
         listeCouche.push(L.marker([long, lat], { icon: iconObj })
-            .bindPopup(textPopup));
+            .bindPopup(textPopup)
+            .on('dblclick', ondbClick));
     };
     let couche = L.layerGroup(listeCouche);
     overlayMaps[nomCouche] = couche;
 }
 
-
+function ondbClick(e) {
+    alert("TEST");
+}
 
 function getColorIcon(nomCouche) {
     let iconObj = goldIcon;

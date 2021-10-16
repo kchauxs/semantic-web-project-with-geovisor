@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS
 import rdf
 
@@ -52,6 +52,14 @@ def hotel_and_lodging():
 @app.route('/financial_entities', methods=['GET'])
 def financial_entities():
     return rdf.returnJson("financial_entities", g)
+
+
+@app.route('/searcher')
+def searcher():
+    param = request.args.get('param')
+    #print(rdf.returnJson("searcher", g, param))
+    return rdf.returnJson("searcher", g, param)
+    # return '''<h1>Param: {}</h1>'''.format(param)
 
 
 if __name__ == '__main__':

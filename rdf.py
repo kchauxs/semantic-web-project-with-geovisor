@@ -7,7 +7,7 @@ import rdflib
 
 def start():
     g = rdflib.graph.ConjunctiveGraph()
-    g.parse('ontologie/jenaV3.owl', format="xml")
+    g.parse('ontologie/jenaV4.owl', format="xml")
     return g
 
 # sparql queries
@@ -32,121 +32,30 @@ def layerIndividualsList(g, class_name=None):
     return(qres)
 
 
-def listeParcs1(g):
+def searcher(g, params=None):
     qres = g.query("""
-
-        SELECT ?Name ?Geo_Json ?Coord ?Adress ?Arrondissements ?Description ?Portion_Arbres_Hauts ?Horaires_Lundi ?Horaires_Mardi ?Horaires_Mercredi ?Horaires_Jeudi ?Horaires_Vendredi ?Horaires_Samedi  ?Horaires_Dimanche
-        WHERE {
-            ?s rdf:type :Low_Fresh_Parks .
-            ?s :Name ?Name .
-            ?s :Geo_Json ?Geo_Json .
-            ?s :Coord ?Coord .
-            ?s :Adress ?Adress .
-            ?s :Arrondissements ?Arrondissements .
-            ?s :Description ?Description .
-            ?s :Portion_Arbres_Hauts ?Portion_Arbres_Hauts .
-            ?s :Horaires_Lundi ?Horaires_Lundi .
-            ?s :Horaires_Mardi ?Horaires_Mardi .
-            ?s :Horaires_Mercredi ?Horaires_Mercredi .
-            ?s :Horaires_Jeudi ?Horaires_Jeudi .
-            ?s :Horaires_Vendredi ?Horaires_Venredi .
-            ?s :Horaires_Samedi ?Horaires_Samedi .
-            ?s :Horaires_Dimanche ?Horaires_Dimanche .
-            }""")
+    prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    prefix : <http://www.semanticweb.org/root/ontologies/2021/9/untitled-ontology-14#>
+    SELECT DISTINCT ?nombre ?direccion ?horario ?Geo_Json ?calificacion ?comentarios ?o
+     WHERE {
+     ?s rdf:type ?object.
+  	 ?s :nombre ?nombre .
+     ?s :direccion ?direccion .
+  	 ?s :horario ?horario .
+     ?s :Geo_Json ?Geo_Json .
+     ?s :calificacion ?calificacion .
+     ?s :comentarios ?comentarios .
+    optional { ?s :brindan ?o } .
+    optional { ?s :esta ?o } .
+    optional { ?s :posee ?o } .
+    optional { ?s :Ttiene ?o } .
+    FILTER (REGEX(str(?object),"%","i")).
+    }
+    """.replace("%", params))
     return(qres)
 
 
-def listeParcs2(g):
-    qres = g.query("""
-
-        SELECT ?Name ?Geo_Json ?Coord ?Adress ?Arrondissements ?Description ?Portion_Arbres_Hauts ?Horaires_Lundi ?Horaires_Mardi ?Horaires_Mercredi ?Horaires_Jeudi ?Horaires_Vendredi ?Horaires_Samedi  ?Horaires_Dimanche
-        WHERE {
-            ?s rdf:type :Medium_Fresh_Parks .
-            ?s :Name ?Name .
-            ?s :Geo_Json ?Geo_Json .
-            ?s :Coord ?Coord .
-            ?s :Adress ?Adress .
-            ?s :Arrondissements ?Arrondissements .
-            ?s :Description ?Description .
-            ?s :Portion_Arbres_Hauts ?Portion_Arbres_Hauts .
-            ?s :Horaires_Lundi ?Horaires_Lundi .
-            ?s :Horaires_Mardi ?Horaires_Mardi .
-            ?s :Horaires_Mercredi ?Horaires_Mercredi .
-            ?s :Horaires_Jeudi ?Horaires_Jeudi .
-            ?s :Horaires_Vendredi ?Horaires_Venredi .
-            ?s :Horaires_Samedi ?Horaires_Samedi .
-            ?s :Horaires_Dimanche ?Horaires_Dimanche .
-            }""")
-    return(qres)
-
-
-def listeParcs3(g):
-    qres = g.query("""
-
-        SELECT ?Name ?Geo_Json ?Coord ?Adress ?Arrondissements ?Description ?Portion_Arbres_Hauts ?Horaires_Lundi ?Horaires_Mardi ?Horaires_Mercredi ?Horaires_Jeudi ?Horaires_Vendredi ?Horaires_Samedi  ?Horaires_Dimanche
-        WHERE {
-            ?s rdf:type :High_Fresh_Parks .
-            ?s :Name ?Name .
-            ?s :Geo_Json ?Geo_Json .
-            ?s :Coord ?Coord .
-            ?s :Adress ?Adress .
-            ?s :Arrondissements ?Arrondissements .
-            ?s :Description ?Description .
-            ?s :Portion_Arbres_Hauts ?Portion_Arbres_Hauts .
-            ?s :Horaires_Lundi ?Horaires_Lundi .
-            ?s :Horaires_Mardi ?Horaires_Mardi .
-            ?s :Horaires_Mercredi ?Horaires_Mercredi .
-            ?s :Horaires_Jeudi ?Horaires_Jeudi .
-            ?s :Horaires_Vendredi ?Horaires_Venredi .
-            ?s :Horaires_Samedi ?Horaires_Samedi .
-            ?s :Horaires_Dimanche ?Horaires_Dimanche .
-            }""")
-    return(qres)
-
-
-def listeActiv(g):
-    qres = g.query("""
-
-        SELECT ?Name ?Geo_Json ?Coord ?Adress ?Arrondissements ?Description ?Payant ?Horaires_Lundi ?Horaires_Mardi ?Horaires_Mercredi ?Horaires_Jeudi ?Horaires_Vendredi ?Horaires_Samedi  ?Horaires_Dimanche
-        WHERE {
-            ?s rdf:type :Fresh_place .
-            ?s :Name ?Name .
-            ?s :Geo_Json ?Geo_Json .
-            ?s :Coord ?Coord .
-            ?s :Adress ?Adress .
-            ?s :Arrondissements ?Arrondissements .
-            ?s :Description ?Description .
-            ?s :Payant ?Payant .
-            ?s :Horaires_Lundi ?Horaires_Lundi .
-            ?s :Horaires_Mardi ?Horaires_Mardi .
-            ?s :Horaires_Mercredi ?Horaires_Mercredi .
-            ?s :Horaires_Jeudi ?Horaires_Jeudi .
-            ?s :Horaires_Vendredi ?Horaires_Venredi .
-            ?s :Horaires_Samedi ?Horaires_Samedi .
-            ?s :Horaires_Dimanche ?Horaires_Dimanche .
-            }""")
-    return(qres)
-
-
-def listeVelo(g):
-    qres = g.query("""
-
-        SELECT ?Name ?Geo_Json ?Coord  ?Arrondissements ?BiDirectional ?Sens_circulation
-        WHERE {
-            ?s rdf:type :bicycle_path .
-            ?s :Name ?Name .
-            ?s :Geo_Json ?Geo_Json .
-            ?s :Coord ?Coord .
-            ?s :Arrondissements ?Arrondissements .
-            ?s :BiDirectional ?BiDirectional .
-            ?s :Sens_circulation ?Sens_circulation .
-            }""")
-    return(qres)
-
-# to JSON
-
-
-def arrayParks(qres):
+def arrayIndividual(qres):
     array = []
     for results in qres:
         array.append({
@@ -156,8 +65,40 @@ def arrayParks(qres):
             "Schedule": results[3],
             "Comments": results[4],
             "Qualification": results[5],
+
         })
     return array
+
+
+def arraySearcher(qres):
+    array = []
+    for results in qres:
+        array.append({
+            "Suject": results[0],
+            "Address":  results[1],
+            "Schedule": results[2],
+            "Geo_Json": results[3],
+            "Qualification": results[4],
+            "Comments": results[5],
+            "Object": None if results[6] == None else results[6].split('#')[1].replace('_', ' ')
+
+        })
+    return array
+
+""" def arraySearcher(qres):
+    array = []
+    for results in qres:
+        array.append({
+            "Suject": results[0] if results[6] == None else results[6].split('#')[1].replace('_', ' '),
+            "Address":  results[1],
+            "Schedule": results[2],
+            "Geo_Json": results[3],
+            "Qualification": results[4],
+            "Comments": results[5],
+            "Object":
+
+        })
+    return array """
 
 
 def arrayEvent(qres):
@@ -219,32 +160,35 @@ def arrayParcs(qres):
     return(array)
 
 
-def returnJson(type, g):
+def returnJson(type, g, params=None):
     if type == "parks":
-        return json.dumps(arrayParks(layerIndividualsList(g, "parques")))
+        return json.dumps(arrayIndividual(layerIndividualsList(g, "parques")))
 
     if type == "warehouse":
-        return json.dumps(arrayParks(layerIndividualsList(g, "almacen")) + arrayParks(layerIndividualsList(g, "galeria")))
+        return json.dumps(arrayIndividual(layerIndividualsList(g, "almacen")) + arrayIndividual(layerIndividualsList(g, "galeria")))
 
     if type == "activities":
-        return json.dumps(arrayParks(layerIndividualsList(g, "balneario")) + arrayParks(layerIndividualsList(g, "deporte")))
+        return json.dumps(arrayIndividual(layerIndividualsList(g, "balneario")) + arrayIndividual(layerIndividualsList(g, "deporte")))
 
     if type == "food_and_drink":
-        return json.dumps(arrayParks(layerIndividualsList(g, "bar")) + arrayParks(layerIndividualsList(g, "restaurante")))
+        return json.dumps(arrayIndividual(layerIndividualsList(g, "bar")) + arrayIndividual(layerIndividualsList(g, "restaurante")))
 
     if type == "culture_and_religion":
-        return json.dumps(arrayParks(layerIndividualsList(g, "iglesia")) + arrayParks(layerIndividualsList(g, "museo")))
+        return json.dumps(arrayIndividual(layerIndividualsList(g, "iglesia")) + arrayIndividual(layerIndividualsList(g, "museo")))
 
     if type == "transport":
-        return json.dumps(arrayParks(layerIndividualsList(g, "aeropuerto")) + arrayParks(layerIndividualsList(g, "terminal")))
+        return json.dumps(arrayIndividual(layerIndividualsList(g, "aeropuerto")) + arrayIndividual(layerIndividualsList(g, "terminal")))
 
     if type == "hotel_and_lodging":
-        return json.dumps(arrayParks(layerIndividualsList(g, "hospedaje")) + arrayParks(layerIndividualsList(g, "hotel")))
+        return json.dumps(arrayIndividual(layerIndividualsList(g, "hospedaje")) + arrayIndividual(layerIndividualsList(g, "hotel")))
 
     if type == "financial_entities":
-        return json.dumps(arrayParks(layerIndividualsList(g, "banco")) + arrayParks(layerIndividualsList(g, "cajero")))
+        return json.dumps(arrayIndividual(layerIndividualsList(g, "banco")) + arrayIndividual(layerIndividualsList(g, "cajero")))
+
+    if type == "searcher":
+        return json.dumps(arraySearcher(searcher(g, params)))
 
 
 if __name__ == "__main__":
     g = start()
-    print(returnJson("food_and_drink", g))
+    print(returnJson("searcher", g))
