@@ -11,6 +11,5 @@ qres = g.query("""
     }
 """)
 
-
 for results in qres:
     print(results, end='\n\n')

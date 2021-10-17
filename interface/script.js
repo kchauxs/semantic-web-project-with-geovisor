@@ -1,30 +1,31 @@
-//create the map
-var map = L.map('map').setView([1.6184774183504775, -75.60791370550324], 15); //start map obj
-var overlayMaps = {};
+const formulario = document.querySelector('#formulario');
+const boton = document.querySelector('#boton');
+const limpiar = document.querySelector('#limpiar');
+const resultado = document.querySelector('#resultado');
+const cabecera = document.querySelector('#resultado');
+let marker = []
 
-var osmLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', { //create the layer
+//create the map
+let map = L.map('map').setView([1.6184774183504775, -75.60791370550324], 15); //start map obj
+let overlayMaps = {};
+let osmLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', { //create the layer
     attribution: '© OpenStreetMap contributors',
     maxZoom: 19
 });
 map.addLayer(osmLayer);
 
 
-//L.marker([48.833, 2.333]).addTo(map).bindPopup("<b>Hello world!</b><br>I am a popup.");//add first marker
-
 //display meteo on map click
-var popup = L.popup();
+let popup = L.popup();
 async function onMapClick(e) {
-    //console.log(e.latlng)
-    //get weather
     API_METEO = 'http://api.openweathermap.org/data/2.5/weather?lat=' + e.latlng.lat + '&lon=' + e.latlng.lng + '&appid=0c0c9aa8bb23a8054260d263e56fc1cc';
     const responseM = await fetch(API_METEO);
     const dataM = await responseM.json();
-    //console.log(dataM)
-    //get air quality
+
     API_AIR = "https://api.waqi.info/feed/geo:" + e.latlng.lat + ";" + e.latlng.lng + "/?token=3ea0f358523452559d46c9d0c715e7908e9d993c"
     const responseA = await fetch(API_AIR);
     const dataA = await responseA.json();
-    //console.log(dataA)
+
     const message = "<b>" + dataM.name + "</b><br>Temperatura : " + ((dataM.main.temp - 273).toFixed(1)) + "°C<br>Clima : " + dataM.weather[0].description + "<br>Índice de calidad del aire  : " + dataA.data.aqi
     popup
         .setLatLng(e.latlng)
@@ -32,16 +33,6 @@ async function onMapClick(e) {
         .openOn(map);
 }
 map.on('click', onMapClick);
-
-
-
-
-
-const formulario = document.querySelector('#formulario');
-const boton = document.querySelector('#boton');
-const resultado = document.querySelector('#resultado');
-const sujecto = document.querySelector('#sujecto');
-let marker = []
 
 
 function markerDelAgain(marker) {
@@ -54,62 +45,13 @@ function markerDelAgain(marker) {
     }
 }
 
+// Get Individuals
+async function getIndividuals(layer) {
 
-async function filtrar() {
-    markerDelAgain(marker)
-    const texto = formulario.value.toLowerCase();
-    const response = await fetch(`http://127.0.0.1:5000/searcher?param=${texto}`, { mode: 'cors' });
-    const data = await response.json();
-    let nameSubjet = ""
-    /* let padlock = false */
-
-    resultado.innerHTML = '';
-    sujecto.innerText = '';
-
-    if (texto.trim() === '') {
-        resultado.innerHTML += ` <li class="list-group-item list-group-item-danger">Producto no encontrado...</li>`
-        return
-    }
-
-    for (let item of data) {
-        let { Suject, Schedule, Address, Qualification, Object } = item
-        //Object == null ? Suject : Object
-        resultado.innerHTML += `
-        <li class="list-group-item"><b>Sitio: </b>${Suject} - <b>Objeto: </b>${Object} - <b>   Dirección: </b>${Address} - <b>Calificación: </b>${Qualification} - <b>Horario: </b>${Schedule}</li>`
-        let [long, lat] = item.Geo_Json.coordinates
-        let textPopup = `
-        <b>${Object == null ? Suject : Object}</b>
-        `
-
-        /*  if (!padlock) {
-             marker.push(L.marker([long, lat], { icon: blueIcon }).addTo(map).bindPopup(textPopup))
-         }
-  */
-        if (Object != null) {
-            nameSubjet = Suject
-            /* padlock = true */
-        }
-        marker.push(L.marker([long, lat], { icon: blueIcon }).addTo(map).bindPopup(textPopup))
-
-    };
-
-    /* if (nameSubjet) {
-        sujecto.innerText = nameSubjet
-    } */
-    formulario.value = "";
-}
-
-boton.addEventListener('click', filtrar);
-//formulario.addEventListener('keyup', filtrar);
-
-async function getIndividuals(nomCouche) {
-    //console.log("loading " + nomCouche)
-    const APIPython = "http://127.0.0.1:5000/" + nomCouche;
+    const APIPython = "http://127.0.0.1:5000/" + layer;
     const response = await fetch(APIPython, { mode: 'cors' });
     const pythonJSON = await response.json();
 
-    //console.log("displaying " + nomCouche)
-    //console.log(pythonJSON)
     let listeCouche = []
     for (let i = 0; i < pythonJSON.length; i++) {
         let { Geo_Json, Name, Comments, Qualification, Address, Schedule } = pythonJSON[i]
@@ -126,15 +68,78 @@ async function getIndividuals(nomCouche) {
         <br>
         Horario: ${Schedule}
         `
-
-        let iconObj = getColorIcon(nomCouche)
+        let iconObj = getColorIcon(layer)
         listeCouche.push(L.marker([long, lat], { icon: iconObj })
             .bindPopup(textPopup)
             .on('dblclick', ondbClick));
     };
     let couche = L.layerGroup(listeCouche);
-    overlayMaps[nomCouche.replace("_", " ").toUpperCase()] = couche;
+    overlayMaps[layer.replace("_", " ").toUpperCase()] = couche;
 }
+
+
+//searcher
+async function searcher() {
+    markerDelAgain(marker)
+    const texto = formulario.value.toLowerCase();
+    const response = await fetch(`http://127.0.0.1:5000/searcher?param=${texto}`, { mode: 'cors' });
+    const data = await response.json();
+
+    cabecera.innerHTML = '';
+    resultado.innerHTML = '';
+
+    if (data.length == 0) {
+        resultado.innerHTML += ` <li class="list-group-item list-group-item-danger">Sitio de interés no encontrado ...</li>`
+        return
+    }
+
+    resultado.innerHTML += `
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Sitio</th>
+        <th scope="col">Objeto</th>
+        <th scope="col">Dirección</th>
+        <th scope="col">Calificación</th>
+        <th scope="col">Horario</th>
+    </tr>
+    `
+    let i = 0
+    for (let item of data) {
+        let { Suject, Schedule, Address, Qualification, Object } = item
+
+        resultado.innerHTML += `
+        <tr>
+            <th scope="row">${++i}</th> 
+            <td>${Suject}</td>
+            <td>${Object == null ? " " : Object}</td>
+            <td>${Address}</td>
+            <td>${Qualification}</td>
+            <td>${Schedule}</td>
+        </tr>
+        `
+        let [long, lat] = item.Geo_Json.coordinates
+        let textPopup = `
+        <b>${Object == null ? Suject : Object}</b>`
+        marker.push(L.marker([long, lat], { icon: blueIcon }).addTo(map).bindPopup(textPopup))
+    };
+    formulario.value = "";
+}
+
+
+boton.addEventListener('click', searcher);
+limpiar.addEventListener('click', () => {
+    markerDelAgain(marker)
+    cabecera.innerHTML = '';
+    resultado.innerHTML = '';
+    
+});
+
+formulario.addEventListener('keyup', (event) => {
+    if (event.keyCode === 13) {
+        searcher()
+    }
+});
+
 
 function ondbClick(e) {
     alert("TEST");
@@ -170,7 +175,7 @@ function getColorIcon(nomCouche) {
 }
 
 //ICON
-var greenIcon = new L.Icon({
+let greenIcon = new L.Icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
     iconSize: [25, 41],
@@ -178,7 +183,7 @@ var greenIcon = new L.Icon({
     popupAnchor: [1, -34],
     shadowSize: [41, 41]
 });
-var goldIcon = new L.Icon({
+let goldIcon = new L.Icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
     iconSize: [25, 41],
@@ -186,7 +191,7 @@ var goldIcon = new L.Icon({
     popupAnchor: [1, -34],
     shadowSize: [41, 41]
 });
-var redIcon = new L.Icon({
+let redIcon = new L.Icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
     iconSize: [25, 41],
@@ -194,7 +199,7 @@ var redIcon = new L.Icon({
     popupAnchor: [1, -34],
     shadowSize: [41, 41]
 });
-var blueIcon = new L.Icon({
+let blueIcon = new L.Icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
     iconSize: [25, 41],
@@ -202,7 +207,7 @@ var blueIcon = new L.Icon({
     popupAnchor: [1, -34],
     shadowSize: [41, 41]
 });
-var orangeIcon = new L.Icon({
+let orangeIcon = new L.Icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
     iconSize: [25, 41],
@@ -211,7 +216,7 @@ var orangeIcon = new L.Icon({
     shadowSize: [41, 41]
 });
 
-var violeIcon = new L.Icon({
+let violeIcon = new L.Icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
     iconSize: [25, 41],
@@ -221,7 +226,7 @@ var violeIcon = new L.Icon({
 });
 
 
-var geyIcon = new L.Icon({
+let geyIcon = new L.Icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-grey.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
     iconSize: [25, 41],
@@ -238,8 +243,6 @@ var blackIcon = new L.Icon({
     popupAnchor: [1, -34],
     shadowSize: [41, 41]
 });
-
-
 
 async function getLayers() {
     const APIPython = "http://127.0.0.1:5000/layer";
