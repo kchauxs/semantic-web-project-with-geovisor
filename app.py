@@ -14,44 +14,49 @@ g = rdf.start()
 print("[INFO] Database loaded: OK")
 
 
-@app.route('/parks', methods=['GET'])
+@app.route('/parques', methods=['GET'])
 def fontaines():
     return rdf.returnJson("parks", g)
 
 
-@app.route('/warehouse', methods=['GET'])
+@app.route('/compras', methods=['GET'])
 def warehouse():
     return rdf.returnJson("warehouse", g)
 
 
-@app.route('/activities', methods=['GET'])
+@app.route('/actividades', methods=['GET'])
 def activities():
     return rdf.returnJson('activities', g)
 
 
-@app.route('/food_and_drink', methods=['GET'])
+@app.route('/comidas_bebidas', methods=['GET'])
 def food_and_drink():
     return rdf.returnJson("food_and_drink", g)
 
 
-@app.route('/culture_and_religion', methods=['GET'])
+@app.route('/cultura_religion', methods=['GET'])
 def culture_and_religion():
     return rdf.returnJson("culture_and_religion", g)
 
 
-@app.route('/transport', methods=['GET'])
+@app.route('/transporte', methods=['GET'])
 def transport():
     return rdf.returnJson("transport", g)
 
 
-@app.route('/hotel_and_lodging', methods=['GET'])
+@app.route('/Hoteles_Hospedajes', methods=['GET'])
 def hotel_and_lodging():
     return rdf.returnJson("hotel_and_lodging", g)
 
 
-@app.route('/financial_entities', methods=['GET'])
+@app.route('/entidades_financieras', methods=['GET'])
 def financial_entities():
     return rdf.returnJson("financial_entities", g)
+
+
+@app.route('/layer', methods=['GET'])
+def layer():
+    return rdf.returnJson("layer", g)
 
 
 @app.route('/searcher')

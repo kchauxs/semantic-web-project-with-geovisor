@@ -1,5 +1,5 @@
 //create the map
-var map = L.map('map').setView([1.6184774183504775, -75.60791370550324], 15); //start map obj
+var map = L.map('map').setView([1.6184774183504775, -75.60791370550324], 14); //start map obj
 var overlayMaps = {};
 
 var osmLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', { //create the layer
@@ -14,104 +14,65 @@ map.addLayer(osmLayer);
 //display meteo on map click
 var popup = L.popup();
 async function onMapClick(e) {
-    //console.log(e.latlng)
+    console.log(e.latlng)
     //get weather
     API_METEO = 'http://api.openweathermap.org/data/2.5/weather?lat=' + e.latlng.lat + '&lon=' + e.latlng.lng + '&appid=0c0c9aa8bb23a8054260d263e56fc1cc';
     const responseM = await fetch(API_METEO);
     const dataM = await responseM.json();
-    //console.log(dataM)
+    console.log(dataM)
     //get air quality
     API_AIR = "https://api.waqi.info/feed/geo:" + e.latlng.lat + ";" + e.latlng.lng + "/?token=3ea0f358523452559d46c9d0c715e7908e9d993c"
     const responseA = await fetch(API_AIR);
     const dataA = await responseA.json();
-    //console.log(dataA)
+    console.log(dataA)
+
     const message = "<b>" + dataM.name + "</b><br>Temperatura : " + ((dataM.main.temp - 273).toFixed(1)) + "°C<br>Clima : " + dataM.weather[0].description + "<br>Índice de calidad del aire  : " + dataA.data.aqi
     popup
         .setLatLng(e.latlng)
         .setContent(message)
         .openOn(map);
 }
+
 map.on('click', onMapClick);
 
 
+async function getVelib() {
+    console.log("loading velib")
+    const API = "https://opendata.paris.fr/api/records/1.0/search/?dataset=velib-disponibilite-en-temps-reel&q=&rows=10000&facet=name&facet=is_installed&facet=is_renting&facet=is_returning&facet=nom_arrondissement_communes";
+    const response = await fetch(API);
+    const velibJSON = await response.json();
+    const listeStations = velibJSON.records;
 
+    console.log("displaying velib");
+    var velibs = [];
+    for (var i = 0; i < listeStations.length; i++) {
+        var lat = listeStations[i].geometry.coordinates[0];
+        var long = listeStations[i].geometry.coordinates[1];
+        var name = listeStations[i].fields.name;
+        var nbBikeAvail = listeStations[i].fields.mechanical;
+        var nbElecAvail = listeStations[i].fields.ebike;
+        var nbDockAvail = listeStations[i].fields.numdocksavailable;
 
+        var textPopup = "<b>" + name + "</b><br>Available mechanical bikes : " + nbBikeAvail + "<br>Available E-bikes : " + nbElecAvail + "<br>Available parking docks : " + nbDockAvail;
 
-const formulario = document.querySelector('#formulario');
-const boton = document.querySelector('#boton');
-const resultado = document.querySelector('#resultado');
-const sujecto = document.querySelector('#sujecto');
-let marker = []
-
-
-function markerDelAgain(marker) {
-    try {
-        for (i = 0; i < marker.length; i++) {
-            map.removeLayer(marker[i]);
-        }
-    } catch (error) {
-        return
-    }
-}
-
-
-async function filtrar() {
-    markerDelAgain(marker)
-    const texto = formulario.value.toLowerCase();
-    const response = await fetch(`http://127.0.0.1:5000/searcher?param=${texto}`, { mode: 'cors' });
-    const data = await response.json();
-    let nameSubjet = ""
-    /* let padlock = false */
-
-    resultado.innerHTML = '';
-    sujecto.innerText = '';
-
-    if (texto.trim() === '') {
-        resultado.innerHTML += ` <li class="list-group-item list-group-item-danger">Producto no encontrado...</li>`
-        return
-    }
-
-    for (let item of data) {
-        let { Suject, Schedule, Address, Qualification, Object } = item
-        //Object == null ? Suject : Object
-        resultado.innerHTML += `
-        <li class="list-group-item"><b>Sitio: </b>${Suject} - <b>Objeto: </b>${Object} - <b>   Dirección: </b>${Address} - <b>Calificación: </b>${Qualification} - <b>Horario: </b>${Schedule}</li>`
-        let [long, lat] = item.Geo_Json.coordinates
-        let textPopup = `
-        <b>${Object == null ? Suject : Object}</b>
-        `
-
-        /*  if (!padlock) {
-             marker.push(L.marker([long, lat], { icon: blueIcon }).addTo(map).bindPopup(textPopup))
-         }
-  */
-        if (Object != null) {
-            nameSubjet = Suject
-            /* padlock = true */
-        }
-        marker.push(L.marker([long, lat], { icon: blueIcon }).addTo(map).bindPopup(textPopup))
-
+        velibs.push(L.marker([long, lat], { icon: goldIcon }).bindPopup(textPopup));
     };
-
-    /* if (nameSubjet) {
-        sujecto.innerText = nameSubjet
-    } */
-    formulario.value = "";
+    console.log(velibs);
+    var layer_velibs = L.layerGroup(velibs);
+    overlayMaps["Velibs"] = await layer_velibs;
 }
 
-boton.addEventListener('click', filtrar);
-//formulario.addEventListener('keyup', filtrar);
-
-async function getIndividuals(nomCouche) {
-    //console.log("loading " + nomCouche)
-    const APIPython = "http://127.0.0.1:5000/" + nomCouche;
+async function getPythonApi(nomCouche, cleAPI) {
+    console.log("loading " + nomCouche)
+    const APIPython = "http://127.0.0.1:5000/" + cleAPI;
     const response = await fetch(APIPython, { mode: 'cors' });
     const pythonJSON = await response.json();
 
-    //console.log("displaying " + nomCouche)
-    //console.log(pythonJSON)
+    console.log("displaying " + nomCouche)
+    console.log(pythonJSON)
     let listeCouche = []
     for (let i = 0; i < pythonJSON.length; i++) {
+
         let { Geo_Json, Name, Comments, Qualification, Address, Schedule } = pythonJSON[i]
         let [long, lat] = Geo_Json.coordinates
 
@@ -133,7 +94,7 @@ async function getIndividuals(nomCouche) {
             .on('dblclick', ondbClick));
     };
     let couche = L.layerGroup(listeCouche);
-    overlayMaps[nomCouche.replace("_", " ").toUpperCase()] = couche;
+    overlayMaps[nomCouche] = couche;
 }
 
 function ondbClick(e) {
@@ -142,32 +103,36 @@ function ondbClick(e) {
 
 function getColorIcon(nomCouche) {
     let iconObj = goldIcon;
-    if (nomCouche == "parques") {
+    if (nomCouche == "Parques") {
         iconObj = greenIcon;
     }
-    if (nomCouche == "compras") {
+    if (nomCouche == "Compras") {
         iconObj = goldIcon;
     }
-    if (nomCouche == "actividades") {
+    if (nomCouche == "Actividades") {
         iconObj = blueIcon;
     }
-    if (nomCouche == "comidas_bebidas") {
+    if (nomCouche == "Comida y Bebidas") {
         iconObj = orangeIcon;
     }
-    if (nomCouche == "cultura_religion") {
+    if (nomCouche == "Cultura y Religion") {
         iconObj = violeIcon;
     }
-    if (nomCouche == "transporte") {
+    if (nomCouche == "Transporte") {
         iconObj = geyIcon;
     }
-    if (nomCouche == "Hoteles_Hospedajes") {
+
+    if (nomCouche == "Hoteles y Hospedaje") {
         iconObj = redIcon;
     }
-    if (nomCouche == "entidades_financieras") {
+    if (nomCouche == "Entidades Financieras") {
         iconObj = blackIcon;
     }
+
     return iconObj
 }
+
+
 
 //ICON
 var greenIcon = new L.Icon({
@@ -241,30 +206,63 @@ var blackIcon = new L.Icon({
 
 
 
-async function getLayers() {
-    const APIPython = "http://127.0.0.1:5000/layer";
-    const response = await fetch(APIPython, { mode: 'cors' });
-    return await response.json();
-}
-
 async function mainGet() {
-    let layer = await getLayers()
-
-    for (let index = 0; index < layer.length; index++) {
-        await getIndividuals(layer[index].Name);
-    }
-
-    /* await getIndividuals("Parques", "parks");
-    await getIndividuals("Compras", "warehouse");
-    await getIndividuals("Actividades", "activities");
-    await getIndividuals("Comida y Bebidas", "food_and_drink");
-    await getIndividuals("Cultura y Religion", "culture_and_religion");
-    await getIndividuals("Transporte", "transport");
-    await getIndividuals("Hoteles y Hospedaje", "hotel_and_lodging");
-    await getIndividuals("Entidades Financieras", "financial_entities"); */
+    await getPythonApi("Parques", "parks");
+    await getPythonApi("Compras", "warehouse");
+    await getPythonApi("Actividades", "activities");
+    await getPythonApi("Comida y Bebidas", "food_and_drink");
+    await getPythonApi("Cultura y Religion", "culture_and_religion");
+    await getPythonApi("Transporte", "transport");
+    await getPythonApi("Hoteles y Hospedaje", "hotel_and_lodging");
+    await getPythonApi("Entidades Financieras", "financial_entities");
 
 }
 mainGet().then(res => {
     L.control.layers({}, overlayMaps).addTo(map);
-
+    console.log(overlayMaps);
 });
+
+
+
+
+//.geoJSON(geojsonFeature).addTo(map);
+
+
+//Función para generar Tabla a partir de los Datos:
+function GenerateTable() {
+    //Build an array containing Customer records.
+    var customers = new Array();
+    customers.push(["Customer Id", "Name", "Country"]);
+    customers.push([1, "John Hammond", "United States"]);
+    customers.push([2, "Mudassar Khan", "India"]);
+    customers.push([3, "Suzanne Mathews", "France"]);
+    customers.push([4, "Robert Schidner", "Russia"]);
+
+    //Create a HTML Table element.
+    var table = document.createElement("table");
+    table.border = "1";
+
+    //Get the count of columns.
+    var columnCount = customers[0].length;
+
+    //Add the header row.
+    var row = table.insertRow(-1);
+    for (var i = 0; i < columnCount; i++) {
+        var headerCell = document.createElement("TH");
+        headerCell.innerHTML = customers[0][i];
+        row.appendChild(headerCell);
+    }
+
+    //Add the data rows.
+    for (var i = 1; i < customers.length; i++) {
+        row = table.insertRow(-1);
+        for (var j = 0; j < columnCount; j++) {
+            var cell = row.insertCell(-1);
+            cell.innerHTML = customers[i][j];
+        }
+    }
+
+    var dvTable = document.getElementById("dvTable");
+    dvTable.innerHTML = "";
+    dvTable.appendChild(table);
+}
