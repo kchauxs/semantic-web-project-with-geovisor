@@ -1,4 +1,4 @@
-# sparql queries
+# Sparql queries
 def layerList(g):
     qres = g.query("""
         prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -7,10 +7,8 @@ def layerList(g):
         SELECT DISTINCT ?subject
 	    WHERE { 
             ?subject rdfs:subClassOf :puntos_interes.
-	        ?object rdf:type owl:Class
         }""")
     return(qres)
-
 
 def layerIndividualsList(g, class_name=None):
     qres = g.query("""
@@ -28,7 +26,6 @@ def layerIndividualsList(g, class_name=None):
         }
             """.replace("%", class_name))
     return(qres)
-
 
 def searcher(g, params=None):
     qres = g.query("""

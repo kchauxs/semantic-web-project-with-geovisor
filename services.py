@@ -1,6 +1,5 @@
 import json
 
-
 def arrayIndividual(qres):
     array = []
     for results in qres:

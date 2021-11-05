@@ -6,7 +6,7 @@ const cabecera = document.querySelector('#resultado');
 let marker = []
 
 //create the map
-let map = L.map('map').setView([1.6184774183504775, -75.60791370550324], 15); //start map obj
+let map = L.map('map').setView([1.6184774183504775, -75.60791370550324], 14); //start map obj
 let overlayMaps = {};
 let osmLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', { //create the layer
     attribution: '© OpenStreetMap contributors',
@@ -70,8 +70,8 @@ async function getIndividuals(layer) {
         `
         let iconObj = getColorIcon(layer)
         listeCouche.push(L.marker([long, lat], { icon: iconObj })
-            .bindPopup(textPopup)
-            .on('dblclick', ondbClick));
+            .bindPopup(textPopup))
+
     };
     let couche = L.layerGroup(listeCouche);
     overlayMaps[layer.replace("_", " ").toUpperCase()] = couche;
@@ -97,7 +97,7 @@ async function searcher() {
     <tr>
         <th scope="col">#</th>
         <th scope="col">Sitio</th>
-        <th scope="col">Objeto</th>
+        <th scope="col">Local</th>
         <th scope="col">Dirección</th>
         <th scope="col">Calificación</th>
         <th scope="col">Horario</th>
@@ -125,13 +125,13 @@ async function searcher() {
     formulario.value = "";
 }
 
-
 boton.addEventListener('click', searcher);
+
 limpiar.addEventListener('click', () => {
     markerDelAgain(marker)
     cabecera.innerHTML = '';
     resultado.innerHTML = '';
-    
+
 });
 
 formulario.addEventListener('keyup', (event) => {
@@ -141,9 +141,6 @@ formulario.addEventListener('keyup', (event) => {
 });
 
 
-function ondbClick(e) {
-    alert("TEST");
-}
 
 function getColorIcon(nomCouche) {
     let iconObj = goldIcon;
@@ -235,7 +232,7 @@ let geyIcon = new L.Icon({
     shadowSize: [41, 41]
 });
 
-var blackIcon = new L.Icon({
+let blackIcon = new L.Icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-black.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
     iconSize: [25, 41],
@@ -243,6 +240,8 @@ var blackIcon = new L.Icon({
     popupAnchor: [1, -34],
     shadowSize: [41, 41]
 });
+
+
 
 async function getLayers() {
     const APIPython = "http://127.0.0.1:5000/layer";
@@ -257,17 +256,7 @@ async function mainGet() {
         await getIndividuals(layer[index].Name);
     }
 
-    /* await getIndividuals("Parques", "parks");
-    await getIndividuals("Compras", "warehouse");
-    await getIndividuals("Actividades", "activities");
-    await getIndividuals("Comida y Bebidas", "food_and_drink");
-    await getIndividuals("Cultura y Religion", "culture_and_religion");
-    await getIndividuals("Transporte", "transport");
-    await getIndividuals("Hoteles y Hospedaje", "hotel_and_lodging");
-    await getIndividuals("Entidades Financieras", "financial_entities"); */
-
 }
 mainGet().then(res => {
     L.control.layers({}, overlayMaps).addTo(map);
-
 });

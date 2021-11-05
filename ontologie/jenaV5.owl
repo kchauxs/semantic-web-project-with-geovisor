@@ -827,7 +827,7 @@
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/root/ontologies/2021/9/untitled-ontology-14#Parque_Principal_Santander">
         <rdf:type rdf:resource="http://www.semanticweb.org/root/ontologies/2021/9/untitled-ontology-14#parques"/>
         <owl:sameAs rdf:resource="http://www.semanticweb.org/root/ontologies/2021/9/untitled-ontology-14#Parque_San_Francisco"/>
-        <untitled-ontology-14:brindan rdf:resource="http://www.semanticweb.org/root/ontologies/2021/9/untitled-ontology-14#actividad_parque_santander"/>
+        <untitled-ontology-14:brindan rdf:resource="http://www.semanticweb.org/root/ontologies/2021/9/untitled-ontology-14#juego_para_niños"/>
         <untitled-ontology-14:Geo_Json rdf:datatype="http://www.w3.org/2001/XMLSchema#string">{&quot;type&quot;: &quot;Point&quot;, &quot;coordinates&quot;: [1.6151872402996237, -75.61333438799555]}</untitled-ontology-14:Geo_Json>
         <untitled-ontology-14:calificacion>4,1</untitled-ontology-14:calificacion>
         <untitled-ontology-14:comentarios>2280</untitled-ontology-14:comentarios>
@@ -944,20 +944,6 @@
     
 
 
-    <!-- http://www.semanticweb.org/root/ontologies/2021/9/untitled-ontology-14#actividad_parque_santander -->
-
-    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/root/ontologies/2021/9/untitled-ontology-14#actividad_parque_santander">
-        <rdf:type rdf:resource="http://www.semanticweb.org/root/ontologies/2021/9/untitled-ontology-14#deporte"/>
-        <untitled-ontology-14:Geo_Json rdf:datatype="http://www.w3.org/2001/XMLSchema#string">{&quot;type&quot;: &quot;Point&quot;, &quot;coordinates&quot;: [1.6151872402996237, -75.61333438799555]}</untitled-ontology-14:Geo_Json>
-        <untitled-ontology-14:calificacion rdf:datatype="http://www.w3.org/2001/XMLSchema#string">4</untitled-ontology-14:calificacion>
-        <untitled-ontology-14:comentarios rdf:datatype="http://www.w3.org/2001/XMLSchema#string">103</untitled-ontology-14:comentarios>
-        <untitled-ontology-14:direccion rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cl. 15 #11-1, Florencia, Caquetá</untitled-ontology-14:direccion>
-        <untitled-ontology-14:horario rdf:datatype="http://www.w3.org/2001/XMLSchema#string">24:00</untitled-ontology-14:horario>
-        <untitled-ontology-14:nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">juegos para niños</untitled-ontology-14:nombre>
-    </owl:NamedIndividual>
-    
-
-
     <!-- http://www.semanticweb.org/root/ontologies/2021/9/untitled-ontology-14#almacen_terminal_Claro -->
 
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/root/ontologies/2021/9/untitled-ontology-14#almacen_terminal_Claro">
@@ -996,6 +982,20 @@
         <untitled-ontology-14:direccion rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cl. 17 #9-14, Florencia, Caquetá</untitled-ontology-14:direccion>
         <untitled-ontology-14:horario rdf:datatype="http://www.w3.org/2001/XMLSchema#string">14:00 - 5:00</untitled-ontology-14:horario>
         <untitled-ontology-14:nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Licores SAM</untitled-ontology-14:nombre>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/root/ontologies/2021/9/untitled-ontology-14#juego_para_niños -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/root/ontologies/2021/9/untitled-ontology-14#juego_para_niños">
+        <rdf:type rdf:resource="http://www.semanticweb.org/root/ontologies/2021/9/untitled-ontology-14#deporte"/>
+        <untitled-ontology-14:Geo_Json rdf:datatype="http://www.w3.org/2001/XMLSchema#string">{&quot;type&quot;: &quot;Point&quot;, &quot;coordinates&quot;: [1.6151872402996237, -75.61333438799555]}</untitled-ontology-14:Geo_Json>
+        <untitled-ontology-14:calificacion rdf:datatype="http://www.w3.org/2001/XMLSchema#string">4</untitled-ontology-14:calificacion>
+        <untitled-ontology-14:comentarios rdf:datatype="http://www.w3.org/2001/XMLSchema#string">103</untitled-ontology-14:comentarios>
+        <untitled-ontology-14:direccion rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cl. 15 #11-1, Florencia, Caquetá</untitled-ontology-14:direccion>
+        <untitled-ontology-14:horario rdf:datatype="http://www.w3.org/2001/XMLSchema#string">24:00</untitled-ontology-14:horario>
+        <untitled-ontology-14:nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">juegos para niños</untitled-ontology-14:nombre>
     </owl:NamedIndividual>
     
 

@@ -1,6 +1,13 @@
 from flask import Flask, request
 from flask_cors import CORS
 import controller_rdf as controller
+import rdflib
+
+# load triplestore
+def start():
+    g = rdflib.graph.ConjunctiveGraph()
+    g.parse('ontologie/jenaV5.owl', format="xml")
+    return g
 
 # start app
 print("[INFO] Starting App: OK")
@@ -10,8 +17,19 @@ print("[INFO] App started: OK")
 
 # load database
 print("[INFO] Loading RDF database: OK")
-g = controller.start()
+g = start()
 print("[INFO] Database loaded: OK")
+
+# Routes
+@app.route('/searcher')
+def searcher():
+    param = request.args.get('param')
+    return controller.returnJson("searcher", g, param)
+
+
+@app.route('/layer', methods=['GET'])
+def layer():
+    return controller.returnJson("layer", g)
 
 
 @app.route('/parques', methods=['GET'])
@@ -52,17 +70,6 @@ def hotel_and_lodging():
 @app.route('/entidades_financieras', methods=['GET'])
 def financial_entities():
     return controller.returnJson("financial_entities", g)
-
-
-@app.route('/layer', methods=['GET'])
-def layer():
-    return controller.returnJson("layer", g)
-
-
-@app.route('/searcher')
-def searcher():
-    param = request.args.get('param')
-    return controller.returnJson("searcher", g, param)
 
 
 if __name__ == '__main__':
